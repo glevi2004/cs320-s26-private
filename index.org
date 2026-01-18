@@ -23,7 +23,7 @@ details.
 | 1/27 | Designing Functions (Workshop)       |                                  |
 | 1/29 | Polymorphism                         | A2 out, A1 due                   |
 |------+--------------------------------------+----------------------------------|
-| 2/2  | Lab 2: Recursion Best-ofs            |                                  |
+| 2/2  | Lab 2: More OCaml Practice           |                                  |
 | 2/3  | Inference Rules                      |                                  |
 | 2/5  | Derivations                          | A3 out, A2 due                   |
 |------+--------------------------------------+----------------------------------|
