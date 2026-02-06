@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-02-03 Tue 17:31 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Assignment 2</title>
+<meta name="author" content="Nathan" />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" type="text/css" href="../../style.css" />
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="org-div-home-and-up">[<a href="https://bu-cs320.github.io/cs320-s26/">back</a>]</div><div id="content" class="content">
+<h1 class="title">Assignment 2</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org4770f80">1. Programming</a>
+<ul>
+<li><a href="#org2c9496e">1.1. Infix Calculator</a></li>
+</ul>
+</li>
+<li><a href="#org819d2fb">2. Written</a>
+<ul>
+<li><a href="#orgffe2f6d">2.1. Types of Expressions</a></li>
+<li><a href="#org8377d8d">2.2. Expressions of Types</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<p>
+This assignment is due on <b>Thursday 2/5 by 8:00PM</b>.  You should put
+all of your programming solutions in a file called
+<code>assign1/lib/assign2.ml</code>. See the file <code>test/test_assign2.ml</code> for
+example behavior of each function.
+</p>
+<div id="outline-container-org4770f80" class="outline-2">
+<h2 id="org4770f80"><span class="section-number-2">1.</span> Programming</h2>
+<div class="outline-text-2" id="text-1">
+</div>
+<div id="outline-container-org2c9496e" class="outline-3">
+<h3 id="org2c9496e"><span class="section-number-3">1.1.</span> Infix Calculator</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+This week's assignment is simple in specify, but pretty darn difficult
+to implement. First, the spec: implement a function
+</p>
+<div class="org-src-container">
+<pre class="src src-ocaml"><span style="color: #000000; font-weight: bold;">val</span> <span style="color: #0000ff;">eval</span> : string list -&gt; int
+</pre>
+</div>
+<p>
+which evaluates an arithmetic expression over addition (<code>+</code>),
+subtraction (<code>-</code>), multiplication (<code>*</code>), and division (<code>/</code>) treated as
+<i>infix</i> operators.  These expressions <i>may have parentheses</i>.  All the
+usual conventions of arithmetic expressions you (should) know (and
+love) apply:
+</p>
+<ul class="org-ul">
+<li>all operators are left associative, i.e., \(1 - 2 - 3 = (1 - 2) - 3\)
+and \(1 / 2 / 3 = (1 / 2) / 3\).</li>
+<li>Addition and subtraction have the same precedence, i.e., \(1 + 2 - 3
+  = (1 + 2) - 3\) and \(1 - 2 + 3 = (1 - 2) + 3\).</li>
+<li>Multiplication and division have the same precedence, i.e., \(1 * 2 /
+  3 = (1 * 2) / 3\) and \(1 / 2 * 3 = (1 / 2) * 3\).</li>
+<li>Multiplication (and division) has higher precedence then addition
+(and subtraction), i.e., \(1 + 2 * 3 = 1 + (2 * 3)\).</li>
+</ul>
+
+<p>
+The input to <code>eval</code> is a list of strings, all of which are of the
+following form:
+</p>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">operator</td>
+<td class="org-left"><code>"+"</code>, <code>"-"</code>, <code>"*"</code>, <code>"/"</code></td>
+</tr>
+
+<tr>
+<td class="org-left">parenthesis</td>
+<td class="org-left"><code>"("</code>, <code>")"</code></td>
+</tr>
+
+<tr>
+<td class="org-left">nonnegative integer</td>
+<td class="org-left">e.g., <code>"123"</code>, <code>"0"</code>, <code>"0021"</code></td>
+</tr>
+</tbody>
+</table>
+<p>
+You may assume that any nonnegative integer that appears in an
+expression can be successfully converted into an integer via
+<code>int_of_string</code>, and that the behavior of <code>eval</code> is undefined in
+the case that the input is not a valid arithmetic expression as
+described above.
+</p>
+
+<p>
+A couple examples:
+</p>
+<div class="org-src-container">
+<pre class="src src-ocaml"><span style="color: #000000; font-weight: bold;">let</span> <span style="color: #a0522d;">_</span> = <span style="color: #a020f0;">assert</span> (eval [<span style="color: #8b2252;">"1"</span>] = 1)
+<span style="color: #000000; font-weight: bold;">let</span> <span style="color: #a0522d;">_</span> = <span style="color: #a020f0;">assert</span> (eval [<span style="color: #8b2252;">"1"</span>; <span style="color: #8b2252;">"+"</span>; <span style="color: #8b2252;">"2"</span>] = 3)
+<span style="color: #000000; font-weight: bold;">let</span> <span style="color: #a0522d;">_</span> = <span style="color: #a020f0;">assert</span> (eval [<span style="color: #8b2252;">"1"</span>; <span style="color: #8b2252;">"+"</span>; <span style="color: #8b2252;">"2"</span>; <span style="color: #8b2252;">"*"</span>; <span style="color: #8b2252;">"3"</span>] = 7)
+<span style="color: #000000; font-weight: bold;">let</span> <span style="color: #a0522d;">_</span> = <span style="color: #a020f0;">assert</span> (eval [<span style="color: #8b2252;">"("</span>; <span style="color: #8b2252;">"1"</span>; <span style="color: #8b2252;">"+"</span>; <span style="color: #8b2252;">"2"</span>; <span style="color: #8b2252;">")"</span>; <span style="color: #8b2252;">"*"</span>; <span style="color: #8b2252;">"3"</span>] = 9)
+</pre>
+</div>
+
+<p>
+<b>Hint:</b> The hardest part of implementing this function is dealing with
+precedence.  A useful observation: we can decompose any arithmetic
+expression as described above in the following way.
+</p>
+
+<ul class="org-ul">
+<li><p>
+At the top level, an arithmetic expression is of the form
+</p>
+
+<p>
+\[
+  e_1 \ (+ \ |\ -) \ e_2 \ (+ \ |\ -) \ \dots \ (+ \ |\ -) \ e_n
+  \]
+</p>
+
+<p>
+where \(e_1, \dots, e_n\) are expressions with only multiplications or
+divisions of numbers and parenthesized expressions.
+</p></li>
+<li><p>
+At the next level, each of those \(e_1, \dots, e_n\) must be
+of the form
+</p>
+
+<p>
+\[
+  f_1 \ (* \ |\ /) \ f_2 \ (* \ |\ /) \ \dots \ (* \ |\ /) \ f_m
+  \]
+where \(f_1, \dots, f_m\) are either numbers or parenthesized
+expressions.
+</p></li>
+</ul>
+
+<p>
+This hints at a <b>mutually recursive</b> approach.  The function <code>eval</code>
+can depend on a function <code>eval_mul_div</code> which evaluates expressions
+like \(e_1, \dots, e_n\) above.  This function can, in turn, depend on a
+function <code>eval_num_paren</code> which can evaluate expressions like \(f_1,
+\dots, f_m\) above.  Finally, this function can depend <i>on the <code>eval</code>
+function we're defining</i> to handle what's in the parentheses.  More
+concretely, this hints at the following skeleton:
+</p>
+<div class="org-src-container">
+<pre class="src src-ocaml"><span style="color: #000000; font-weight: bold;">let</span> <span style="color: #0000ff;">drop_last</span> <span style="color: #a0522d;">l</span> =
+  <span style="color: #a020f0;">match</span> l <span style="color: #a020f0;">with</span>
+  | x <span style="color: #000000; background-color: #ffffff;">::</span> y <span style="color: #000000; background-color: #ffffff;">::</span> rest -&gt; x <span style="color: #000000; background-color: #ffffff;">::</span> drop_last (y <span style="color: #000000; background-color: #ffffff;">::</span> rest)
+  | _ -&gt; <span style="color: #000000; background-color: #ffffff;">[]</span>
+
+<span style="color: #000000; font-weight: bold;">let</span> <span style="color: #0000ff;">eval</span> <span style="color: #a0522d;">expr</span> =
+  <span style="color: #a020f0;">assert</span> <span style="color: #008b8b;">false</span> <span style="color: #b22222;">(* </span><span style="color: #b22222;">TODO</span><span style="color: #b22222;"> *)</span>
+<span style="color: #000000; font-weight: bold;">and</span> <span style="color: #0000ff;">eval_mul_div</span> <span style="color: #a0522d;">expr</span> =
+  <span style="color: #a020f0;">assert</span> <span style="color: #008b8b;">false</span> <span style="color: #b22222;">(* </span><span style="color: #b22222;">TODO</span><span style="color: #b22222;"> *)</span>
+<span style="color: #000000; font-weight: bold;">and</span> <span style="color: #0000ff;">eval_num_paren</span> <span style="color: #a0522d;">expr</span> =
+  <span style="color: #a020f0;">match</span> expr <span style="color: #a020f0;">with</span>
+  | [n] -&gt; int_of_string n               <span style="color: #b22222;">(* </span><span style="color: #b22222;">number</span><span style="color: #b22222;"> *)</span>
+  | <span style="color: #8b2252;">"("</span> <span style="color: #000000; background-color: #ffffff;">::</span> rest -&gt; eval (drop_last rest) <span style="color: #b22222;">(* </span><span style="color: #b22222;">parened expr</span><span style="color: #b22222;"> *)</span>
+  | _ -&gt; <span style="color: #a020f0;">assert</span> <span style="color: #008b8b;">false</span>                    <span style="color: #b22222;">(* </span><span style="color: #b22222;">undefined</span><span style="color: #b22222;"> *)</span>
+</pre>
+</div>
+<p>
+Note the use of a new keyword: <code>and</code>.  This allows us to define
+functions in terms of each other (i.e., mutually).
+</p>
+
+<p>
+There are other ways to approach this function, but hopefully this
+provides a basis from which you can get started.  Happy coding!
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org819d2fb" class="outline-2">
+<h2 id="org819d2fb"><span class="section-number-2">2.</span> Written</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-orgffe2f6d" class="outline-3">
+<h3 id="orgffe2f6d"><span class="section-number-3">2.1.</span> Types of Expressions</h3>
+<div class="outline-text-3" id="text-2-1">
+<ol class="org-ol">
+<li><p>
+What is the type of <code>g</code> so that the following expression is
+well-typed? Can <code>g</code> be given a polymorphic type? Also, what is the
+type of the following expression? Justify your answer.
+</p>
+<div class="org-src-container">
+<pre class="src src-ocaml"><span style="color: #000000; font-weight: bold;">let</span> <span style="color: #000000; font-weight: bold;">rec</span> <span style="color: #0000ff;">f</span> <span style="color: #a0522d;">x</span> = g x + g (f x) <span style="color: #000000; font-weight: bold;">in</span> f
+</pre>
+</div></li>
+<li><p>
+Suppose that <code>h</code> is of type <code>'a list-&gt; 'a list -&gt; 'a</code> and <code>k</code> is
+of type <code>'b -&gt; ('b -&gt; 'b) list</code>. Determine the type of the
+following expression.  Justify your answer.
+</p>
+<div class="org-src-container">
+<pre class="src src-ocaml"><span style="color: #a020f0;">fun</span> <span style="color: #a0522d;">x</span> <span style="color: #a0522d;">y</span> -&gt; h x (k y)
+</pre>
+</div></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org8377d8d" class="outline-3">
+<h3 id="org8377d8d"><span class="section-number-3">2.2.</span> Expressions of Types</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+For each of the following types, determine an OCaml expression using
+only basic constructs (e.g., anonymous functions, applications,
+variables, list constructors, match statements, etc.) of the given
+type.  In particular, you cannot use exceptions or assertions, and the
+expression should type-check without warnings.  If this is not
+possible, then explain why in 1-2 sentences.
+</p>
+<ol class="org-ol">
+<li><code>'a -&gt; 'b -&gt; 'a</code></li>
+<li><code>int -&gt; 'a</code></li>
+<li><code>'a -&gt; 'a list</code></li>
+<li><code>'a list -&gt; 'a</code></li>
+<li><code>('a -&gt; 'b) -&gt; 'a -&gt; 'b</code><sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup></li>
+<li><code>('a -&gt; 'b) -&gt; ('b -&gt; 'c) -&gt; 'a -&gt; 'c</code></li>
+</ol>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">We technically haven't talked about
+higher-order functions yet, but you should hopefully have enough
+background to understand what this type means.</p></div></div>
+
+
+</div>
+</div></div>
+</body>
+</html>

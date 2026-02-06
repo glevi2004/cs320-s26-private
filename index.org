@@ -22,11 +22,11 @@ details.
 |------+--------------------------------------+------------------+----------------------------------|
 | 1/26 | Lab 1: [[file:labs/lab01/lab01.org][Verifying your Set-up]]         |                  |                                  |
 | 1/27 | Designing Functions (Workshop)       |                  |                                  |
-| 1/29 | Polymorphism                         |                  | A2 out, A1 due                   |
+| 1/29 | Polymorphism                         |                  | [[file:assigns/assign2/assign2.org][A2]] out, A1 due                   |
 |------+--------------------------------------+------------------+----------------------------------|
-| 2/2  | Lab 2: More OCaml Practice           |                  |                                  |
-| 2/3  | Inference Rules                      |                  |                                  |
-| 2/5  | Derivations                          |                  | A3 out, A2 due                   |
+| 2/2  | Lab 2: [[file:labs/lab02/lab02.org][Mutual Recursion]]              |                  |                                  |
+| 2/3  | Inference Rules                      | COPL 2.1         |                                  |
+| 2/5  | Derivations                          | COPL 2.2, 2.3    | [[file:assigns/assign3/assign3.org][A3]] out, A2 due                   |
 |------+--------------------------------------+------------------+----------------------------------|
 | 2/9  | Lab 3: Derivations Worksheet         |                  |                                  |
 | 2/10 | Products and Sums                    |                  |                                  |

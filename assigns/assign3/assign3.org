@@ -1,0 +1,185 @@
+#+title: Assignment 3
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../../style.css" />
+#+OPTIONS: html-style:nil H:3 toc:2
+#+HTML_LINK_HOME: https://bu-cs320.github.io/cs320-s26/
+This assignment is due on *Thursday 2/12 by 8:00PM*.  You should put
+all of your programming solutions in a file called
+~assign3/lib/assign3.ml~. See the file ~test/test_assign3.ml~ for
+example behavior of each function.  Your written solutions should be
+submitted via Gradescope as a single pdf.  They must be exceptionally
+neat (or typed) and the final answer in your solution to each problem
+must be abundantly clear, e.g., surrounded in a box.  Also make sure
+to cite your sources per the instructions in the course manual.
+
+* Programming
+
+This week you'll be building (surprise) a calculator.  Or rather,
+you'll be extending the calculator from the previous assignment so
+that values can be assigned to variables.  The inputs to this
+calculator are statements of the form
+
+#+begin_src txt
+  VARIABLE = <expr>
+#+end_src
+
+where ~VARIABLE~ is a variable name composed solely of upper-case
+letters and ~<expr>~ is an infix arithmetic expression as in
+assignment 2 but potentially with variables.  So, for example, after
+you've implemented the following functions you should be able to have
+the following interaction via ~dune exec assign3~:
+
+#+begin_src txt
+ArithVar version 0.0.1
+Enter #quit;; to exit
+
+# X = 2 * 2;;
+- : int = 4
+#      Y     =     3  *     4;;
+- : int = 12
+# ADDXY
+  =
+  X
+  +
+  Y
+  ;;
+- : int = 16
+#+end_src
+
+There are several functions to implement, but you should take
+assignment 2 as a staring point.
+** Lexing
+Implement the function
+#+begin_src ocaml
+  val lex : string -> string list
+#+end_src
+so that ~lex input~ is the result of removing the whitespace from
+~input~ and separating it into its constituent parts (formally called
+*lexemes*). These parts consist of: ~(~, ~)~, ~+~, ~-~, ~*~, ~/~, ~=~,
+nonnegative integers (i.e. contiguous groups of digits) and variables
+(i.e., contiguous groups of upper-case letters), e.g.,
+
+#+begin_src
+  let _ = assert (lex "VAR = 2 + 3" = ["VAR"; "="; "2"; "+"; "3"])
+#+end_src
+
+The behavior of the function is undefined if the input is not a
+well-formed statement as described above.
+
+** Evaluation
+
+Evaluation is roughly the same as in assignment 2, except that now
+it's possible that the given expression contains variables.  We'll be
+using association lists to represent variable bindings that we create
+during a calculator interaction.  An association list is a list of
+key-value pairs (~('k * 'v) list~).  See the [[https://cs3110.github.io/textbook/chapters/data/assoc_list.html][textbook chapter]] and the
+[[https://nmmull.github.io/stdlib320/stdlib320/Stdlib320/List/index.html#association-lists][~stdlib320~ section]] for more information.  For the above sample
+interaction the final assocation list we should get up to reordering
+is:
+
+#+begin_src
+  [("X", 4); ("Y", 12); ("ADDXY", 16)]
+#+end_src
+
+
+Implement the function
+
+#+begin_src ocaml
+  val eval : (string * int) list -> string list -> int
+#+end_src
+so that ~eval env expr~ is the result of evaluating an arithmetic
+expression ~expr~ in infix notation with variables (i.e., the
+right-hand side of the ~"="~ after lexing) relative to the variable
+bindings in ~env~, e.g.,
+
+#+begin_src
+  let _ = assert (eval [("X", 4); ("Y", 12)] ["X"; "+"; "Y"] = 16)
+#+end_src
+
+The behavior of the function is undefined if ~expr~ is not a valid
+arithmetic expression in infix notation with variables post-lexing.
+
+** Unique Insertion
+
+After evaluating an expression, we'll need to add it to the variable
+bindings maintained by the calculator.  Implement the function
+
+#+begin_src
+  val insert_uniq : 'k -> 'v -> ('k * 'v) list -> ('k * 'v) list
+#+end_src
+
+so that ~insert_uniq k v l~ is the result of inserting ~(k, v)~ into
+~l~.  Furthermore, your implementation must maintain the invariant
+that /a key appears at most once in the resulting list/. Furthermore
+furthermore, your implementation must be tail recursive.  *Note:* The
+order of key-value pairs does /not/ need to be maintained in the
+resulting list.
+
+#+begin_src
+  let l = [("X", 4); ("Y", 12); ("ADDXY", 16)]
+  let _ = assert (List.assoc "X" l = 4)
+  let _ = assert (List.assoc "X" (insert_uniq "X" 7 l) = 7)
+#+end_src
+
+* Written
+For all derivations, make sure that you label every rule instantiation
+with a rule name, and that you do /not/ include side-conditions.  The
+rules you should use for your derivations are included in the notes
+for this course under the section *320Caml Specification*.
+
+** Typing Derivations
+
+1. Determine a type $\tau$ such that the following typing judgment is
+   derivable.  Also provide the derivation.
+
+   \[
+   \{ \texttt{f} : \texttt{int -> bool} \} \vdash \texttt{let x = let y = 3 in y + y in f x} : \tau
+   \]
+
+2. Determine a type $\tau$ such that the following typing judgment is
+   derivable.  Also provide the derivation.
+
+   \[
+   \{\} \vdash \texttt{(fun x -> fun y -> y x) (fun x -> x) (fun f -> f 1)} : \tau
+   \]
+
+** Semantic Derivations
+
+1. Determine a value $v$ such that the following semantic judgment is
+   derivable.  Also provide the derivation.
+
+   \[
+   \texttt{let x = 3 in if x = 4 then x + 1 else x + 2} \Downarrow v
+   \]
+2. Determine a value $v$ such that the following semantic judgment is
+   derivable.  Also provide the derivation.
+
+   \[
+   \texttt{let x = let y = 3 + 3 in x} \Downarrow v
+   \]
+
+** Recursive Let-Expressions
+
+One rule not included in the 320Caml specification is the typing rule
+for recursive let expressions, which have the following syntax:
+
+#+begin_src txt
+  <expr> ::= let rec <var> = <expr> in <expr>
+#+end_src
+
+The only difference between the let rule and the recursive let rule is
+that, given an expression of form:
+
+\[
+\texttt{let} \ \texttt{rec}\ f \ \texttt{=} \ e_1 \ \texttt{in} \ e_2
+\]
+
+determining the type of $e_1$ requires that $f$ appears in the
+context, since the definition of a recursive function can depend on
+the function itself.
+
+Provide the typing rule for recursive let statements (we'll call it *LetRec*),
+and use this to give a derivation of the following typing judgment.
+
+\[
+\{\} \vdash \texttt{let rec f = fun x -> f (x + 1) = 0 in f} : \texttt{int -> int}
+\]

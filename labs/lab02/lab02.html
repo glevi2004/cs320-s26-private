@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-02-01 Sun 16:02 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lab 2: Mutual Recursion</title>
+<meta name="author" content="Nathan" />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" type="text/css" href="../../style.css" />
+</head>
+<body>
+<div id="org-div-home-and-up">[<a href="../../index.html">back</a>]</div><div id="content" class="content">
+<h1 class="title">Lab 2: Mutual Recursion</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orgd0f9c6d">1. Introduction</a></li>
+<li><a href="#org617ea88">2. The Task</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgd0f9c6d" class="outline-2">
+<h2 id="orgd0f9c6d"><span class="section-number-2">1.</span> Introduction</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+The focus of this lab is <i>mutual recursion</i>.  A function is recursive
+if, roughly speaking, its implementation refers to itself.  Several
+functions are mutually recurive if their implementations refer to each
+other, often in a cyclical fashion.
+</p>
+
+<p>
+The canonical (though admittedly somewhat boring) example is defining
+evenness in terms of oddness (and vice versa):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ocaml"><span style="color: #000000; font-weight: bold;">let</span> <span style="color: #000000; font-weight: bold;">rec</span> <span style="color: #0000ff;">even</span> <span style="color: #a0522d;">n</span> =
+  <span style="color: #a020f0;">if</span> n = 0
+  <span style="color: #a020f0;">then</span> <span style="color: #008b8b;">true</span>
+  <span style="color: #a020f0;">else</span> odd (n - 1)
+<span style="color: #000000; font-weight: bold;">and</span> <span style="color: #0000ff;">odd</span> <span style="color: #a0522d;">n</span> =
+  <span style="color: #a020f0;">if</span> n = 0
+  <span style="color: #a020f0;">then</span> <span style="color: #008b8b;">false</span>
+  <span style="color: #a020f0;">else</span> even (n - 1)
+
+<span style="color: #000000; font-weight: bold;">let</span> <span style="color: #0000ff;">even</span> <span style="color: #a0522d;">n</span> = even (abs n)
+<span style="color: #000000; font-weight: bold;">let</span> <span style="color: #0000ff;">odd</span> <span style="color: #a0522d;">n</span> = odd (abs n)
+</pre>
+</div>
+
+<p>
+Note the special <code>and</code> keyword which allows us to define mutually
+recursive functions.  Also note that this keyword is not strictly
+necessary:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ocaml"><span style="color: #000000; font-weight: bold;">let</span> <span style="color: #000000; font-weight: bold;">rec</span> <span style="color: #0000ff;">even</span> <span style="color: #a0522d;">n</span> =
+  <span style="color: #000000; font-weight: bold;">let</span> <span style="color: #0000ff;">odd</span> <span style="color: #a0522d;">n</span> =
+    <span style="color: #a020f0;">if</span> n = 0
+    <span style="color: #a020f0;">then</span> <span style="color: #008b8b;">false</span>
+    <span style="color: #a020f0;">else</span> even (n - 1)
+  <span style="color: #000000; font-weight: bold;">in</span>
+  n = 0 <span style="color: #a52a2a;">||</span> odd (n - 1)
+</pre>
+</div>
+
+<p>
+but it has the benefit that <i>both</i> <code>even</code> and <code>odd</code> are in scope after
+being defined.<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>
+</p>
+</div>
+</div>
+<div id="outline-container-org617ea88" class="outline-2">
+<h2 id="org617ea88"><span class="section-number-2">2.</span> The Task</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+The primary task for today is to build an evaluator for arithmetic
+expressions (not unlike assignment 2) but with only subtraction and
+parentheses:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ocaml"><span style="color: #000000; font-weight: bold;">let</span> <span style="color: #a0522d;">_</span> = <span style="color: #a020f0;">assert</span> (<span style="color: #228b22;">Lab02.</span>interp <span style="color: #8b2252;">"1 - 2"</span> = -1)
+<span style="color: #000000; font-weight: bold;">let</span> <span style="color: #a0522d;">_</span> = <span style="color: #a020f0;">assert</span> (<span style="color: #228b22;">Lab02.</span>interp <span style="color: #8b2252;">"2 - 3 - 4"</span> = -5)
+<span style="color: #000000; font-weight: bold;">let</span> <span style="color: #a0522d;">_</span> = <span style="color: #a020f0;">assert</span> (<span style="color: #228b22;">Lab02.</span>interp <span style="color: #8b2252;">"((6))"</span> = 6)
+<span style="color: #000000; font-weight: bold;">let</span> <span style="color: #a0522d;">_</span> = <span style="color: #a020f0;">assert</span> (<span style="color: #228b22;">Lab02.</span>interp <span style="color: #8b2252;">"1 - (2 - 3 - 4) - ((6))"</span> = 0)
+</pre>
+</div>
+
+<p>
+You'll find starter code in the course repository, and the TF/TA
+leading your lab are there to help you. It is <i>highly recommended</i>
+that you would with others, even pair-program; this is what labs are
+for.
+</p>
+
+<p>
+You will not be turning in any code for this (or any other)
+lab. Instead you will be filling out a lab handout which you will
+receive during your lab period.
+</p>
+
+<p>
+Happy calculating!
+</p>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">It also, in my opinion, makes mutually recursive
+code a little easier to read and reason about.</p></div></div>
+
+
+</div>
+</div></div>
+</body>
+</html>

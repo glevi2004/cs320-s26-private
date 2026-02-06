@@ -1,0 +1,129 @@
+#+title: Assignment 2
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../../style.css" />
+#+OPTIONS: html-style:nil H:3 toc:2
+#+HTML_LINK_HOME: https://bu-cs320.github.io/cs320-s26/
+This assignment is due on *Thursday 2/5 by 8:00PM*.  You should put
+all of your programming solutions in a file called
+~assign1/lib/assign2.ml~. See the file ~test/test_assign2.ml~ for
+example behavior of each function.
+
+* Programming
+** Infix Calculator
+This week's assignment is simple in specify, but pretty darn difficult
+to implement. First, the spec: implement a function
+#+begin_src ocaml
+  val eval : string list -> int
+#+end_src
+which evaluates an arithmetic expression over addition (~+~),
+subtraction (~-~), multiplication (~*~), and division (~/~) treated as
+/infix/ operators.  These expressions /may have parentheses/.  All the
+usual conventions of arithmetic expressions you (should) know (and
+love) apply:
++ all operators are left associative, i.e., $1 - 2 - 3 = (1 - 2) - 3$
+  and $1 / 2 / 3 = (1 / 2) / 3$.
++ Addition and subtraction have the same precedence, i.e., $1 + 2 - 3
+  = (1 + 2) - 3$ and $1 - 2 + 3 = (1 - 2) + 3$.
++ Multiplication and division have the same precedence, i.e., $1 * 2 /
+  3 = (1 * 2) / 3$ and $1 / 2 * 3 = (1 / 2) * 3$.
++ Multiplication (and division) has higher precedence then addition
+  (and subtraction), i.e., $1 + 2 * 3 = 1 + (2 * 3)$.
+
+The input to ~eval~ is a list of strings, all of which are of the
+following form:
+|---------------------+--------------------------------|
+| operator            | ~"+"~, ~"-"~, ~"*"~, ~"/"~     |
+| parenthesis         | ~"("~, ~")"~                   |
+| nonnegative integer | e.g., ~"123"~, ~"0"~, ~"0021"~ |
+|---------------------+--------------------------------|
+You may assume that any nonnegative integer that appears in an
+expression can be successfully converted into an integer via
+~int_of_string~, and that the behavior of ~eval~ is undefined in
+the case that the input is not a valid arithmetic expression as
+described above.
+
+A couple examples:
+#+begin_src ocaml
+  let _ = assert (eval ["1"] = 1)
+  let _ = assert (eval ["1"; "+"; "2"] = 3)
+  let _ = assert (eval ["1"; "+"; "2"; "*"; "3"] = 7)
+  let _ = assert (eval ["("; "1"; "+"; "2"; ")"; "*"; "3"] = 9)
+#+end_src
+
+*Hint:* The hardest part of implementing this function is dealing with
+precedence.  A useful observation: we can decompose any arithmetic
+expression as described above in the following way.
+
++ At the top level, an arithmetic expression is of the form
+
+  \[
+  e_1 \ (+ \ |\ -) \ e_2 \ (+ \ |\ -) \ \dots \ (+ \ |\ -) \ e_n
+  \]
+
+  where $e_1, \dots, e_n$ are expressions with only multiplications or
+  divisions of numbers and parenthesized expressions.
++ At the next level, each of those $e_1, \dots, e_n$ must be
+  of the form
+
+  \[
+  f_1 \ (* \ |\ /) \ f_2 \ (* \ |\ /) \ \dots \ (* \ |\ /) \ f_m
+  \]
+  where $f_1, \dots, f_m$ are either numbers or parenthesized
+  expressions.
+
+This hints at a *mutually recursive* approach.  The function ~eval~
+can depend on a function ~eval_mul_div~ which evaluates expressions
+like $e_1, \dots, e_n$ above.  This function can, in turn, depend on a
+function ~eval_num_paren~ which can evaluate expressions like $f_1,
+\dots, f_m$ above.  Finally, this function can depend /on the ~eval~
+function we're defining/ to handle what's in the parentheses.  More
+concretely, this hints at the following skeleton:
+#+begin_src ocaml
+  let drop_last l =
+    match l with
+    | x :: y :: rest -> x :: drop_last (y :: rest)
+    | _ -> []
+
+  let eval expr =
+    assert false (* TODO *)
+  and eval_mul_div expr =
+    assert false (* TODO *)
+  and eval_num_paren expr =
+    match expr with
+    | [n] -> int_of_string n               (* number *)
+    | "(" :: rest -> eval (drop_last rest) (* parened expr *)
+    | _ -> assert false                    (* undefined *)
+#+end_src
+Note the use of a new keyword: ~and~.  This allows us to define
+functions in terms of each other (i.e., mutually).
+
+There are other ways to approach this function, but hopefully this
+provides a basis from which you can get started.  Happy coding!
+* Written
+** Types of Expressions
+1. What is the type of ~g~ so that the following expression is
+   well-typed? Can ~g~ be given a polymorphic type? Also, what is the
+   type of the following expression? Justify your answer.
+   #+begin_src ocaml
+     let rec f x = g x + g (f x) in f
+   #+end_src
+2. Suppose that ~h~ is of type ~'a list-> 'a list -> 'a~ and ~k~ is
+   of type ~'b -> ('b -> 'b) list~. Determine the type of the
+   following expression.  Justify your answer.
+   #+begin_src ocaml
+     fun x y -> h x (k y)
+   #+end_src
+** Expressions of Types
+For each of the following types, determine an OCaml expression using
+only basic constructs (e.g., anonymous functions, applications,
+variables, list constructors, match statements, etc.) of the given
+type.  In particular, you cannot use exceptions or assertions, and the
+expression should type-check without warnings.  If this is not
+possible, then explain why in 1-2 sentences.
+1. ~'a -> 'b -> 'a~
+2. ~int -> 'a~
+3. ~'a -> 'a list~
+4. ~'a list -> 'a~
+5. ~('a -> 'b) -> 'a -> 'b~[fn::We technically haven't talked about
+   higher-order functions yet, but you should hopefully have enough
+   background to understand what this type means.]
+6. ~('a -> 'b) -> ('b -> 'c) -> 'a -> 'c~

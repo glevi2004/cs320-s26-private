@@ -1,0 +1,9 @@
+(lang dune 3.20)
+
+(name lab02)
+
+(generate_opam_files true)
+
+(package
+ (name lab02)
+ (depends ocaml))

@@ -1,0 +1,68 @@
+#+title: Lab 2: Mutual Recursion
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../../style.css" />
+#+OPTIONS: html-style:nil H:3 toc:2
+#+HTML_LINK_HOME: ../../index.html
+* Introduction
+The focus of this lab is /mutual recursion/.  A function is recursive
+if, roughly speaking, its implementation refers to itself.  Several
+functions are mutually recurive if their implementations refer to each
+other, often in a cyclical fashion.
+
+The canonical (though admittedly somewhat boring) example is defining
+evenness in terms of oddness (and vice versa):
+
+#+begin_src ocaml
+  let rec even n =
+    if n = 0
+    then true
+    else odd (n - 1)
+  and odd n =
+    if n = 0
+    then false
+    else even (n - 1)
+
+  let even n = even (abs n)
+  let odd n = odd (abs n)
+#+end_src
+
+Note the special ~and~ keyword which allows us to define mutually
+recursive functions.  Also note that this keyword is not strictly
+necessary:
+
+#+begin_src ocaml
+  let rec even n =
+    let odd n =
+      if n = 0
+      then false
+      else even (n - 1)
+    in
+    n = 0 || odd (n - 1)
+#+end_src
+
+but it has the benefit that /both/ ~even~ and ~odd~ are in scope after
+being defined.[fn::It also, in my opinion, makes mutually recursive
+code a little easier to read and reason about.]
+
+* The Task
+
+The primary task for today is to build an evaluator for arithmetic
+expressions (not unlike assignment 2) but with only subtraction and
+parentheses:
+
+#+begin_src ocaml
+  let _ = assert (Lab02.interp "1 - 2" = -1)
+  let _ = assert (Lab02.interp "2 - 3 - 4" = -5)
+  let _ = assert (Lab02.interp "((6))" = 6)
+  let _ = assert (Lab02.interp "1 - (2 - 3 - 4) - ((6))" = 0)
+#+end_src
+
+You'll find starter code in the course repository, and the TF/TA
+leading your lab are there to help you. It is /highly recommended/
+that you would with others, even pair-program; this is what labs are
+for.
+
+You will not be turning in any code for this (or any other)
+lab. Instead you will be filling out a lab handout which you will
+receive during your lab period.
+
+Happy calculating!
