@@ -181,5 +181,5 @@ Provide the typing rule for recursive let statements (we'll call it *LetRec*),
 and use this to give a derivation of the following typing judgment.
 
 \[
-\{\} \vdash \texttt{let rec f = fun x -> f (x + 1) = 0 in f} : \texttt{int -> int}
+\{\} \vdash \texttt{let rec f = fun x -> f (x + 1) = 0 in f} : \texttt{int -> bool}
 \]

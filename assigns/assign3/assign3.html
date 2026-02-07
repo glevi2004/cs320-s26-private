@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-02-05 Thu 19:33 -->
+<!-- 2026-02-07 Sat 11:48 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Assignment 3</title>
@@ -50,18 +50,18 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgf4501f5">1. Programming</a>
+<li><a href="#orga63a0ca">1. Programming</a>
 <ul>
-<li><a href="#orga6df07e">1.1. Lexing</a></li>
-<li><a href="#org817a339">1.2. Evaluation</a></li>
-<li><a href="#orgba7340c">1.3. Unique Insertion</a></li>
+<li><a href="#org09386ce">1.1. Lexing</a></li>
+<li><a href="#orgac55ffc">1.2. Evaluation</a></li>
+<li><a href="#org289550e">1.3. Unique Insertion</a></li>
 </ul>
 </li>
-<li><a href="#org51a9091">2. Written</a>
+<li><a href="#org5dd810b">2. Written</a>
 <ul>
-<li><a href="#orgaa75078">2.1. Typing Derivations</a></li>
-<li><a href="#orgb11fe43">2.2. Semantic Derivations</a></li>
-<li><a href="#orgde48e06">2.3. Recursive Let-Expressions</a></li>
+<li><a href="#org71b38fd">2.1. Typing Derivations</a></li>
+<li><a href="#org4e4f343">2.2. Semantic Derivations</a></li>
+<li><a href="#orgd40ff17">2.3. Recursive Let-Expressions</a></li>
 </ul>
 </li>
 </ul>
@@ -77,8 +77,8 @@ neat (or typed) and the final answer in your solution to each problem
 must be abundantly clear, e.g., surrounded in a box.  Also make sure
 to cite your sources per the instructions in the course manual.
 </p>
-<div id="outline-container-orgf4501f5" class="outline-2">
-<h2 id="orgf4501f5"><span class="section-number-2">1.</span> Programming</h2>
+<div id="outline-container-orga63a0ca" class="outline-2">
+<h2 id="orga63a0ca"><span class="section-number-2">1.</span> Programming</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 This week you'll be building (surprise) a calculator.  Or rather,
@@ -123,8 +123,8 @@ There are several functions to implement, but you should take
 assignment 2 as a staring point.
 </p>
 </div>
-<div id="outline-container-orga6df07e" class="outline-3">
-<h3 id="orga6df07e"><span class="section-number-3">1.1.</span> Lexing</h3>
+<div id="outline-container-org09386ce" class="outline-3">
+<h3 id="org09386ce"><span class="section-number-3">1.1.</span> Lexing</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 Implement the function
@@ -152,8 +152,8 @@ well-formed statement as described above.
 </p>
 </div>
 </div>
-<div id="outline-container-org817a339" class="outline-3">
-<h3 id="org817a339"><span class="section-number-3">1.2.</span> Evaluation</h3>
+<div id="outline-container-orgac55ffc" class="outline-3">
+<h3 id="orgac55ffc"><span class="section-number-3">1.2.</span> Evaluation</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 Evaluation is roughly the same as in assignment 2, except that now
@@ -198,8 +198,8 @@ arithmetic expression in infix notation with variables post-lexing.
 </p>
 </div>
 </div>
-<div id="outline-container-orgba7340c" class="outline-3">
-<h3 id="orgba7340c"><span class="section-number-3">1.3.</span> Unique Insertion</h3>
+<div id="outline-container-org289550e" class="outline-3">
+<h3 id="org289550e"><span class="section-number-3">1.3.</span> Unique Insertion</h3>
 <div class="outline-text-3" id="text-1-3">
 <p>
 After evaluating an expression, we'll need to add it to the variable
@@ -229,8 +229,8 @@ let _ = assert (List.assoc "X" (insert_uniq "X" 7 l) = 7)
 </div>
 </div>
 </div>
-<div id="outline-container-org51a9091" class="outline-2">
-<h2 id="org51a9091"><span class="section-number-2">2.</span> Written</h2>
+<div id="outline-container-org5dd810b" class="outline-2">
+<h2 id="org5dd810b"><span class="section-number-2">2.</span> Written</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 For all derivations, make sure that you label every rule instantiation
@@ -239,8 +239,8 @@ rules you should use for your derivations are included in the notes
 for this course under the section <b>320Caml Specification</b>.
 </p>
 </div>
-<div id="outline-container-orgaa75078" class="outline-3">
-<h3 id="orgaa75078"><span class="section-number-3">2.1.</span> Typing Derivations</h3>
+<div id="outline-container-org71b38fd" class="outline-3">
+<h3 id="org71b38fd"><span class="section-number-3">2.1.</span> Typing Derivations</h3>
 <div class="outline-text-3" id="text-2-1">
 <ol class="org-ol">
 <li><p>
@@ -267,8 +267,8 @@ derivable.  Also provide the derivation.
 </ol>
 </div>
 </div>
-<div id="outline-container-orgb11fe43" class="outline-3">
-<h3 id="orgb11fe43"><span class="section-number-3">2.2.</span> Semantic Derivations</h3>
+<div id="outline-container-org4e4f343" class="outline-3">
+<h3 id="org4e4f343"><span class="section-number-3">2.2.</span> Semantic Derivations</h3>
 <div class="outline-text-3" id="text-2-2">
 <ol class="org-ol">
 <li><p>
@@ -294,8 +294,8 @@ derivable.  Also provide the derivation.
 </ol>
 </div>
 </div>
-<div id="outline-container-orgde48e06" class="outline-3">
-<h3 id="orgde48e06"><span class="section-number-3">2.3.</span> Recursive Let-Expressions</h3>
+<div id="outline-container-orgd40ff17" class="outline-3">
+<h3 id="orgd40ff17"><span class="section-number-3">2.3.</span> Recursive Let-Expressions</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 One rule not included in the 320Caml specification is the typing rule
@@ -331,7 +331,7 @@ and use this to give a derivation of the following typing judgment.
 
 <p>
 \[
-\{\} \vdash \texttt{let rec f = fun x -> f (x + 1) = 0 in f} : \texttt{int -> int}
+\{\} \vdash \texttt{let rec f = fun x -> f (x + 1) = 0 in f} : \texttt{int -> bool}
 \]
 </p>
 </div>
