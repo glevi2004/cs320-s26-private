@@ -1,0 +1,60 @@
+1.1
+
+g can be given type 'a -> int so that f has type 'a -> int.  The
+output type of g is determined by the fact that (g x) is an argument
+of (+).  Nothing restricts the type of x.  The output type of f is
+determined by the fact that the body of f an integer addition.
+
+1.2
+
+The first argument x should be an 'a list because it is an argument to
+h.  The second argument y should be of type 'b because it is an
+argument to k.  But (k y) is the second argument of h which should be
+of type 'a list by the type of h, and it is a ('b -> 'b) list by type
+of k.  Since these must be the same, we have to instantiate 'a at the
+type 'b -> 'b. Therefore, the type of h x (k y) is 'b -> 'b, and x is
+of type ('b -> 'b) list.  This gives us the type
+
+('b -> 'b) list -> 'b -> 'b -> 'b
+
+Note that this is equivalent to
+
+('a -> 'a) list -> 'a -> 'a -> 'a
+
+i.e., its the same up to renaming of the type parameter.
+
+2.1
+
+fun x -> fun y -> x
+
+or
+
+fun (x : 'a) -> fun (y : 'b) -> x
+
+2.2
+
+Not possible, without knowing what 'a is, we cannot construct
+something of this type.
+
+2.3
+
+fun x -> [x]
+
+or
+
+fun x -> [x;x]
+
+or...
+
+2.4
+
+Not possible, the input list may be empty, in which case there's not
+way to construct an 'a.
+
+2.5
+
+fun f -> fun x -> f x
+
+2.6
+
+fun f -> fun g -> fun x -> g (f x)
