@@ -30,11 +30,11 @@ details.
 |------+--------------------------------------+------------------+----------------------------------|
 | 2/9  | Lab 3: [[file:labs/lab03/lab03.org][Derivations Worksheet]]         |                  |                                  |
 | 2/10 | Products and Sums                    | OCP [[https://cs3110.github.io/textbook/chapters/data/intro.html][3]]            |                                  |
-| 2/12 | Algebraic Data Types (Workshop)      | OCP [[https://cs3110.github.io/textbook/chapters/data/intro.html][3]]            | A4 out, A3 due                   |
+| 2/12 | Algebraic Data Types (Workshop)      | OCP [[https://cs3110.github.io/textbook/chapters/data/intro.html][3]]            | A3 due                           |
 |------+--------------------------------------+------------------+----------------------------------|
 | 2/16 | *No Lab*                             |                  | Presidents’ Day                  |
 | 2/17 | Lab 4: Midterm Review                |                  | Substitute Monday                |
-| 2/19 | *Midterm 1*                          |                  |                                  |
+| 2/19 | *Midterm 1*                          |                  | A4 out                           |
 |------+--------------------------------------+------------------+----------------------------------|
 | 2/23 | Lab 5: S-Expressions                 |                  |                                  |
 | 2/24 | Higher-Order Programming             | OCP [[https://cs3110.github.io/textbook/chapters/hop/intro.html][4]]            |                                  |
