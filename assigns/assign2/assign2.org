@@ -7,7 +7,7 @@ all of your programming solutions in a file called
 ~assign1/lib/assign2.ml~. See the file ~test/test_assign2.ml~ for
 example behavior of each function.
 
-* Programming
+* Programming (50%)
 ** Infix Calculator
 This week's assignment is simple in specify, but pretty darn difficult
 to implement. First, the spec: implement a function
@@ -98,7 +98,7 @@ functions in terms of each other (i.e., mutually).
 
 There are other ways to approach this function, but hopefully this
 provides a basis from which you can get started.  Happy coding!
-* Written
+* Written (50%)
 ** Types of Expressions
 1. What is the type of ~g~ so that the following expression is
    well-typed? Can ~g~ be given a polymorphic type? Also, what is the

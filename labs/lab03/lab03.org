@@ -1,0 +1,19 @@
+#+title: Lab 3: Derivations Worksheet
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../../style.css" />
+#+OPTIONS: html-style:nil H:3 toc:2
+#+HTML_LINK_HOME: ../../index.html
+
+This week you'll be given a worksheet with a couple problems to
+practice writing derivations.  A secondary objective of this lab is
+to emphasize that, when substituting a value into an expression, it is
+implicitly /converted/ back into an expression.  So, for example,
+
+#+begin_src txt
+  [λx . x / f](f y) = (fun x -> x) y
+#+end_src
+
+That is, the variable ~f~ in the expression ~f y~ is replaced with the
+function expression ~fun x -> x~ and not the function value ~λ x . x~.
+
+As usual, please use this opportunity to clear up any confusions you
+have by asking the TF/TAs questions. They're very smart folks!

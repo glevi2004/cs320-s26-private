@@ -1,0 +1,3 @@
+(library
+ (name workshop2)
+ (public_name workshop2))

@@ -11,7 +11,7 @@ neat (or typed) and the final answer in your solution to each problem
 must be abundantly clear, e.g., surrounded in a box.  Also make sure
 to cite your sources per the instructions in the course manual.
 
-* Programming
+* Programming (%40)
 
 This week you'll be building (surprise) a calculator.  Or rather,
 you'll be extending the calculator from the previous assignment so
@@ -120,7 +120,7 @@ resulting list.
   let _ = assert (List.assoc "X" (insert_uniq "X" 7 l) = 7)
 #+end_src
 
-* Written
+* Written (60%)
 For all derivations, make sure that you label every rule instantiation
 with a rule name, and that you do /not/ include side-conditions.  The
 rules you should use for your derivations are included in the notes
@@ -154,7 +154,7 @@ for this course under the section *320Caml Specification*.
    derivable.  Also provide the derivation.
 
    \[
-   \texttt{let x = let y = 3 + 3 in x} \Downarrow v
+   \texttt{let x = let y = 3 + 3 in y in x} \Downarrow v
    \]
 
 ** Recursive Let-Expressions
@@ -177,9 +177,11 @@ determining the type of $e_1$ requires that $f$ appears in the
 context, since the definition of a recursive function can depend on
 the function itself.
 
-Provide the typing rule for recursive let statements (we'll call it *LetRec*),
-and use this to give a derivation of the following typing judgment.
+Provide the typing rule for recursive let statements (we'll call it
+*LetRec*), and use this to give a derivation of the following typing
+judgment.[fn::*Errata (2/10, 7:00AM):* The change to the given
+expression is in red given.]
 
 \[
-\{\} \vdash \texttt{let rec f = fun x -> f (x + 1) = 0 in f} : \texttt{int -> int}
+\{\} \vdash \texttt{let rec f = fun x -> f (x + 1) = }\textcolor{red}{\texttt{false}}\texttt{ in f} : \texttt{int -> bool}
 \]
