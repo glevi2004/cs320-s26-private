@@ -1,0 +1,45 @@
+#+title: Lab 6: Higher-Order Functions
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../../style.css" />
+#+OPTIONS: html-style:nil H:3 toc:2
+#+HTML_LINK_HOME: ../../index.html
+
+This week you'll be getting some additional practice with higher-order
+functions.  To start, you should know how ~map~, ~filter~,
+~fold_right~ and ~fold_left~ work for lists.  Primarily you will be
+generalizing these to matrices.  There are two secondary objectives of
+this lab:
+
++ One topic we lost due to the blizzard was *modules*. They're
+  not crucial, but they certainly make programming in OCaml more
+  comfortable.  In short, a module is something like a namespace.  We
+  use the following syntax for constructing a module:
+  #+begin_src ocaml
+    module ModuleName = struct
+      ...
+    end
+  #+end_src
+  What appears between ~struct~ and ~end~ is anything that we have
+  considered an OCaml program thus far.  For example:
+  #+begin_src ocaml
+    module Foo = struct
+      let bar x = x + 1
+    end
+  #+end_src
+  Outside of the module definition, I can use dot notation to refer to
+  definitions given within the module:
+  #+begin_src ocaml
+    let baz : int = Foo.bar 3
+  #+end_src
+  Modules are also used to organize interfaces for functional data
+  structures in OCaml.  Lists, for example, are defined within a
+  module, and every time you've used a list function from the standard
+  library (e.g., ~List.rev~) you've been referring to the /module/
+  List (in which ~rev~ is defined).  We'll be using OCaml's module
+  system in this lab to organize our small interface for matrices.
++ The topic of this weeks (delayed) assignment is /tensors/, which are
+  a generalization of both vectors (which we can think of essentially
+  as lists) and matrices.  Understanding how to work with matrices
+  will be useful for thinking about how to work with tensors.
+
+As usual, please use this opportunity to clear up any confusions you
+have by asking the course staff questions. They're very smart folks!

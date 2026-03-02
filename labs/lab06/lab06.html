@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-01 Sun 14:08 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lab 6: Higher-Order Functions</title>
+<meta name="author" content="Nathan" />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" type="text/css" href="../../style.css" />
+</head>
+<body>
+<div id="org-div-home-and-up">[<a href="../../index.html">back</a>]</div><div id="content" class="content">
+<h1 class="title">Lab 6: Higher-Order Functions</h1>
+<p>
+This week you'll be getting some additional practice with higher-order
+functions.  To start, you should know how <code>map</code>, <code>filter</code>,
+<code>fold_right</code> and <code>fold_left</code> work for lists.  Primarily you will be
+generalizing these to matrices.  There are two secondary objectives of
+this lab:
+</p>
+
+<ul class="org-ul">
+<li><p>
+One topic we lost due to the blizzard was <b>modules</b>. They're
+not crucial, but they certainly make programming in OCaml more
+comfortable.  In short, a module is something like a namespace.  We
+use the following syntax for constructing a module:
+</p>
+<div class="org-src-container">
+<pre class="src src-ocaml"><span style="color: #000000; font-weight: bold;">module</span> <span style="color: #228b22;">ModuleName</span> = <span style="color: #000000; font-weight: bold;">struct</span>
+  ...
+<span style="color: #000000; font-weight: bold;">end</span>
+</pre>
+</div>
+<p>
+What appears between <code>struct</code> and <code>end</code> is anything that we have
+considered an OCaml program thus far.  For example:
+</p>
+<div class="org-src-container">
+<pre class="src src-ocaml"><span style="color: #000000; font-weight: bold;">module</span> <span style="color: #228b22;">Foo</span> = <span style="color: #000000; font-weight: bold;">struct</span>
+  <span style="color: #000000; font-weight: bold;">let</span> <span style="color: #0000ff;">bar</span> <span style="color: #a0522d;">x</span> = x + 1
+<span style="color: #000000; font-weight: bold;">end</span>
+</pre>
+</div>
+<p>
+Outside of the module definition, I can use dot notation to refer to
+definitions given within the module:
+</p>
+<div class="org-src-container">
+<pre class="src src-ocaml"><span style="color: #000000; font-weight: bold;">let</span> <span style="color: #a0522d;">baz</span> :<span style="color: #228b22;"> int </span>= <span style="color: #228b22;">Foo.</span>bar 3
+</pre>
+</div>
+<p>
+Modules are also used to organize interfaces for functional data
+structures in OCaml.  Lists, for example, are defined within a
+module, and every time you've used a list function from the standard
+library (e.g., <code>List.rev</code>) you've been referring to the <i>module</i>
+List (in which <code>rev</code> is defined).  We'll be using OCaml's module
+system in this lab to organize our small interface for matrices.
+</p></li>
+<li>The topic of this weeks (delayed) assignment is <i>tensors</i>, which are
+a generalization of both vectors (which we can think of essentially
+as lists) and matrices.  Understanding how to work with matrices
+will be useful for thinking about how to work with tensors.</li>
+</ul>
+
+<p>
+As usual, please use this opportunity to clear up any confusions you
+have by asking the course staff questions. They're very smart folks!
+</p>
+</div>
+</body>
+</html>
