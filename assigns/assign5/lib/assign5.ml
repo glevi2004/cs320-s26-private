@@ -17,10 +17,100 @@ type stmt = Syntax.stmt =
   | Set of string * string list * expr
 
 let dim_check (env : (string * tensor) list) (e : expr) : ((string * int) list) option =
-  ignore (env, e); assert false (* TODO *)
+  let distinct (labels : string list) : bool =
+    let rec go (seen : string list) (l : string list) : bool =
+      match l with
+      | [] -> true
+      | x :: xs ->
+        if List.mem x seen then false
+        else go (x :: seen) xs
+    in go [] labels
+  in
+  let consistent (idx1 : (string * int) list) (idx2 : (string * int) list) : bool =
+    List.for_all (fun (label, size) ->
+      match List.assoc_opt label idx2 with
+      | None -> true
+      | Some size2 -> size = size2
+    ) idx1
+  in
+  let union (idx1 : (string * int) list) (idx2 : (string * int) list) : (string * int) list =
+    let extra = List.filter (fun (label, _) -> not (List.mem_assoc label idx1)) idx2 in
+    idx1 @ extra
+  in
+  let rec check (e : expr) : (string * int) list option =
+    match e with
+    | Ident (a, labels) -> (
+      match List.assoc_opt a env with
+      | None -> None
+      | Some t ->
+        let idx = Tensor.idx_space t in
+        if List.length labels <> List.length idx then None
+        else if not (distinct labels) then None
+        else Some (List.map2 (fun label (_, size) -> (label, size)) labels idx)
+    )
+    | Map (_, e1, e2) -> (
+      match check e1, check e2 with
+      | Some idx1, Some idx2 ->
+        if consistent idx1 idx2 then Some (union idx1 idx2)
+        else None
+      | _ -> None
+    )
+    | Fold (_, i, e) -> (
+      match check e with
+      | Some idx ->
+        if List.mem_assoc i idx
+        then Some (List.filter (fun (label, _) -> label <> i) idx)
+        else None
+      | None -> None
+    )
+  in
+  check e
 
 let eval (env : (string * tensor) list) (e : expr) : tensor =
-  ignore (env, e); assert false (* TODO *)
+  let op_fn (o : op) : float -> float -> float =
+    match o with
+    | Add -> ( +. )
+    | Mul -> ( *. )
+  in
+  let op_identity (o : op) : float =
+    match o with
+    | Add -> 0.
+    | Mul -> 1.
+  in
+  let rec go (e : expr) : tensor =
+    match e with
+    | Ident (a, labels) ->
+      let t = List.assoc a env in
+      Tensor.relabel_axes t labels
+    | Map (o, e1, e2) ->
+      let t1 = go e1 in
+      let t2 = go e2 in
+      let idx1 = Tensor.idx_space t1 in
+      let idx2 = Tensor.idx_space t2 in
+      let extra = List.filter (fun (label, _) -> not (List.mem_assoc label idx1)) idx2 in
+      let idx_space = idx1 @ extra in
+      let f = op_fn o in
+      Tensor.init idx_space (fun idx ->
+        f (Tensor.get t1 idx) (Tensor.get t2 idx)
+      )
+    | Fold (o, i, e) ->
+      let t = go e in
+      let t_idx = Tensor.idx_space t in
+      let size = List.assoc i t_idx in
+      let result_idx = List.filter (fun (label, _) -> label <> i) t_idx in
+      let f = op_fn o in
+      let base = op_identity o in
+      Tensor.init result_idx (fun idx ->
+        let rec fold_loop (k : int) (acc : float) : float =
+          if k >= size then acc
+          else
+            let full_idx = (i, k) :: idx in
+            fold_loop (k + 1) (f acc (Tensor.get t full_idx))
+        in
+        fold_loop 0 base
+      )
+  in
+  go e
 
 type error =
   | Parse_error
