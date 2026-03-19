@@ -1,0 +1,165 @@
+#+title: Lab 7: Generating an S-expression Parser
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../../style.css" />
+#+OPTIONS: html-style:nil H:3 toc:2
+#+HTML_LINK_HOME: ../../index.html
+
+This week you'll be building a lexer+parser using lexer+parser
+generators.[fn::The lexer generator we'll be using is called Ocamllex
+and the parser generator is called Menhir, both of which are veritable
+beasts of software, really only worth engaging with if you have to.]
+Concretely: you'll be building a parser for S-expressions so we can
+see[fn::If you did, in fact, do [[https://bu-cs320.github.io/cs320-s26/labs/lab05/lab05.html][Lab 5]] during the second of our
+snowstorms.] how simple it is to generate the code we previously wrote
+by hand.  The primary objective of this lab is to get comfortable with
+the idea that we can in fact generate parsers from grammars.  One
+newer feature of CS320 is that we will /not/ be asking you to build
+parsers in the second half of the course[fn::A not-completely-popular
+choice we will try to justify at a later time.]  so this will be your
+one opportunity to see in broad strokes how the parsers in the
+upcoming mini-projects work.
+
+The course staff will walk you through the process of generating a
+lexer+parser, but here's a rough outline.
+
+1. *Tell dune we want to use Menhir*, i.e., add the stanza:
+   #+begin_src dune
+   (using menhir 3.0)
+   #+end_src
+   to the end of ~dune-project~.
+
+2. *Set up the infrastructure*: create five files in ~lib~:
+
+   #+begin_src ascii
+     lib
+     ├──dune
+     ├──ast.ml
+     ├──lab07.ml
+     ├──lexer.mll
+     └──parser.mly
+   #+end_src
+
+   ~dune~:
+   #+begin_src dune
+     (library (name lab07) (public_name lab07))
+     (ocamllex lexer)
+     (menhir (modules parser))
+   #+end_src
+
+   ~ast.ml:~
+   #+begin_src ocaml
+     type sexpr =
+       | Atom of string
+       | List of sexpr list
+   #+end_src
+
+   ~lab07.ml:~
+   #+begin_src ocaml
+     let parse (s : string) : Ast.sexpr option =
+       match Parser.sexpr Lexer.read (Lexing.from_string s) with
+       | prog -> Some prog
+       | exception _ -> None
+   #+end_src
+
+   ~lexer.mll~:
+   #+begin_src mll
+     let whitespace = [' ' '\t' '\n' '\r']+
+
+     rule read =
+       parse
+       | whitespace { read lexbuf }
+       | eof { EOF }
+   #+end_src
+   The lexer specification expresses that whitespace (which is any
+   nonempty sequence of spaces, tabs, newlines/line feeds and carriage
+   returns) will be ignored.
+
+   ~parser.mly~:
+   #+begin_src mly
+     %token EOF
+
+     %start<Ast.sexpr> prog
+
+     %%
+
+     prog:
+       | EOF { e }
+   #+end_src
+   The parser specification expresses that ~prog~ (short for /program/)
+   is the start symbol of the grammar, and parsing a program produces
+   an ~sexpr~.  It also includes an ~EOF~ token (short for /End Of
+   File/) to (eventually) express that we want to hit the end of the
+   file after we finish parsing our program/S-expressioni.
+
+3. *Declare our tokens.* These declarations should appear above the
+   ~%%~, which separates token/start-symbol declarations from grammar rules.
+
+   #+begin_src mly
+   %token LPAREN
+   %token RPAREN
+   %token<string> ATOM
+   %token EOF
+
+   %start<Ast.sexpr> sexpr
+
+   %%
+
+   ...
+   #+end_src
+
+4. *Specify our rules.* This amounts to translating EBNF grammar's
+   production rules into the arcane syntax of Menhir, e.g.,
+   #+begin_src bnf
+     <sexpr> ::= ( {<sexpr>} )
+   #+end_src
+   becomes:
+   #+begin_src mly
+     expr:
+       | LPAREN; l=expr*; RPAREN { Ast.List l }
+       ...
+   #+end_src
+   Remember: parsing is not just about /recognizing/ sentences; we
+   also need to construct the *abstract syntax tree (AST)*, i.e., the
+   hierarchical data of the sentence (in this case, an ~sexpr~).
+
+5. *Specify our lexemes*; we need to tell the lexer which lexemes
+   correspond to which tokens.  There's a lot going on here, so we'll
+   give you this one:[fn::Feel free to ignore all the ~lexbuf~ stuff,
+   but if you're interested, ocamllex maintains a buffer for part of
+   the input that it's processing called ~lexbuf~.  The
+   function ~Lexing.lexeme~ grabs the beginning of that buffer
+   corresponding to the pattern just matched (e.g., the ~atom~ regular
+   expression).]
+   #+begin_src mll
+     let whitespace = [' ' '\t' '\n' '\r']+
+     let atom = [^ ' ' '\t' '\n' '\r' '(' ')']+
+
+     rule read =
+       parse
+       | "(" { Parser.LPAREN }
+       | ")" { Parser.RPAREN }
+       | atom { Parser.ATOM (Lexing.lexeme lexbuf) }
+       | whitespace { read lexbuf }
+       | eof { Parser.EOF }
+   #+end_src
+   Note that we use /regular expressions/ to represent complex tokens
+   like atoms; the ~atom~ regex expresses that an atom is a nonempty
+   sequence anything /but/ whitespace or parentheses.
+
+6. If all goes well you should be able to open ~dune utop~, evaluate:
+   #+begin_src ocaml
+     Lab07.parse "( (a b   c ) () ((d e ) f))";;
+   #+end_src
+   and see:
+   #+begin_src ocaml
+     Some
+      (Lab07__.Ast.List
+        [Lab07__.Ast.List
+          [Lab07__.Ast.Atom "a"; Lab07__.Ast.Atom "b"; Lab07__.Ast.Atom "c"];
+         Lab07__.Ast.List [];
+         Lab07__.Ast.List
+          [Lab07__.Ast.List [Lab07__.Ast.Atom "d"; Lab07__.Ast.Atom "e"];
+           Lab07__.Ast.Atom "f"]])
+   #+end_src
+
+As usual, please use this opportunity to clear up any confusions you
+have by asking the course staff questions. They're very smart folks!

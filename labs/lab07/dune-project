@@ -1,0 +1,5 @@
+(lang dune 3.20)
+(name lab07)
+(generate_opam_files true)
+(package (name lab07) (depends ocaml))
+(using menhir 3.0)

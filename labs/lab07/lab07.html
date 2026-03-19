@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-13 Fri 11:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lab 7: Generating an S-expression Parser</title>
+<meta name="author" content="Nathan" />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" type="text/css" href="../../style.css" />
+</head>
+<body>
+<div id="org-div-home-and-up">[<a href="../../index.html">back</a>]</div><div id="content" class="content">
+<h1 class="title">Lab 7: Generating an S-expression Parser</h1>
+<p>
+This week you'll be building a lexer+parser using lexer+parser
+generators.<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>
+Concretely: you'll be building a parser for S-expressions so we can
+see<sup><a id="fnr.2" class="footref" href="#fn.2" role="doc-backlink">2</a></sup> how simple it is to generate the code we previously wrote
+by hand.  The primary objective of this lab is to get comfortable with
+the idea that we can in fact generate parsers from grammars.  One
+newer feature of CS320 is that we will <i>not</i> be asking you to build
+parsers in the second half of the course<sup><a id="fnr.3" class="footref" href="#fn.3" role="doc-backlink">3</a></sup>  so this will be your
+one opportunity to see in broad strokes how the parsers in the
+upcoming mini-projects work.
+</p>
+
+<p>
+The course staff will walk you through the process of generating a
+lexer+parser, but here's a rough outline.
+</p>
+
+<ol class="org-ol">
+<li><p>
+<b>Tell dune we want to use Menhir</b>, i.e., add the stanza:
+</p>
+<div class="org-src-container">
+<pre class="src src-dune">(using menhir 3.0)
+</pre>
+</div>
+<p>
+to the end of <code>dune-project</code>.
+</p></li>
+
+<li><p>
+<b>Set up the infrastructure</b>: create five files in <code>lib</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ascii">lib
+├──dune
+├──ast.ml
+├──lab07.ml
+├──lexer.mll
+└──parser.mly
+</pre>
+</div>
+
+<p>
+<code>dune</code>:
+</p>
+<div class="org-src-container">
+<pre class="src src-dune">(library (name lab07) (public_name lab07))
+(ocamllex lexer)
+(menhir (modules parser))
+</pre>
+</div>
+
+<p>
+<code>ast.ml:</code>
+</p>
+<div class="org-src-container">
+<pre class="src src-ocaml"><span style="color: #000000; font-weight: bold;">type</span> <span style="color: #228b22;">sexpr</span> =
+  | <span style="color: #000000; background-color: #ffffff;">Atom</span> <span style="color: #a020f0;">of</span> string
+  | <span style="color: #000000; background-color: #ffffff;">List</span> <span style="color: #a020f0;">of</span> sexpr list
+</pre>
+</div>
+
+<p>
+<code>lab07.ml:</code>
+</p>
+<div class="org-src-container">
+<pre class="src src-ocaml"><span style="color: #000000; font-weight: bold;">let</span> <span style="color: #0000ff;">parse</span> (<span style="color: #a0522d;">s</span> :<span style="color: #228b22;"> string</span>) :<span style="color: #228b22;"> </span><span style="color: #228b22;">Ast.</span><span style="color: #228b22;">sexpr option </span>=
+  <span style="color: #a020f0;">match</span> <span style="color: #228b22;">Parser.</span>sexpr <span style="color: #228b22;">Lexer.</span>read (<span style="color: #228b22;">Lexing.</span>from_string s) <span style="color: #a020f0;">with</span>
+  | prog -&gt; <span style="color: #000000; background-color: #ffffff;">Some</span> prog
+  | <span style="color: #a020f0;">exception</span> _ -&gt; None
+</pre>
+</div>
+
+<p>
+<code>lexer.mll</code>:
+</p>
+<div class="org-src-container">
+<pre class="src src-mll">let whitespace = [' ' '\t' '\n' '\r']+
+
+rule read =
+  parse
+  | whitespace { read lexbuf }
+  | eof { EOF }
+</pre>
+</div>
+<p>
+The lexer specification expresses that whitespace (which is any
+nonempty sequence of spaces, tabs, newlines/line feeds and carriage
+returns) will be ignored.
+</p>
+
+<p>
+<code>parser.mly</code>:
+</p>
+<div class="org-src-container">
+<pre class="src src-mly">%token EOF
+
+%start&lt;Ast.sexpr&gt; prog
+
+%%
+
+prog:
+  | EOF { e }
+</pre>
+</div>
+<p>
+The parser specification expresses that <code>prog</code> (short for <i>program</i>)
+is the start symbol of the grammar, and parsing a program produces
+an <code>sexpr</code>.  It also includes an <code>EOF</code> token (short for <i>End Of
+File</i>) to (eventually) express that we want to hit the end of the
+file after we finish parsing our program/S-expressioni.
+</p></li>
+
+<li><p>
+<b>Declare our tokens.</b> These declarations should appear above the
+<code>%%</code>, which separates token/start-symbol declarations from grammar rules.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-mly">%token LPAREN
+%token RPAREN
+%token&lt;string&gt; ATOM
+%token EOF
+
+%start&lt;Ast.sexpr&gt; sexpr
+
+%%
+
+...
+</pre>
+</div></li>
+
+<li><p>
+<b>Specify our rules.</b> This amounts to translating EBNF grammar's
+production rules into the arcane syntax of Menhir, e.g.,
+</p>
+<div class="org-src-container">
+<pre class="src src-bnf">&lt;<span style="color: #0000ff;">sexpr</span>&gt; <span style="color: #008b8b;">::=</span> ( {&lt;<span style="color: #483d8b;">sexpr</span>&gt;} )
+</pre>
+</div>
+<p>
+becomes:
+</p>
+<div class="org-src-container">
+<pre class="src src-mly">expr:
+  | LPAREN; l=expr*; RPAREN { Ast.List l }
+  ...
+</pre>
+</div>
+<p>
+Remember: parsing is not just about <i>recognizing</i> sentences; we
+also need to construct the <b>abstract syntax tree (AST)</b>, i.e., the
+hierarchical data of the sentence (in this case, an <code>sexpr</code>).
+</p></li>
+
+<li><p>
+<b>Specify our lexemes</b>; we need to tell the lexer which lexemes
+correspond to which tokens.  There's a lot going on here, so we'll
+give you this one:<sup><a id="fnr.4" class="footref" href="#fn.4" role="doc-backlink">4</a></sup>
+</p>
+<div class="org-src-container">
+<pre class="src src-mll">let whitespace = [' ' '\t' '\n' '\r']+
+let atom = [^ ' ' '\t' '\n' '\r' '(' ')']+
+
+rule read =
+  parse
+  | "(" { Parser.LPAREN }
+  | ")" { Parser.RPAREN }
+  | atom { Parser.ATOM (Lexing.lexeme lexbuf) }
+  | whitespace { read lexbuf }
+  | eof { Parser.EOF }
+</pre>
+</div>
+<p>
+Note that we use <i>regular expressions</i> to represent complex tokens
+like atoms; the <code>atom</code> regex expresses that an atom is a nonempty
+sequence anything <i>but</i> whitespace or parentheses.
+</p></li>
+
+<li><p>
+If all goes well you should be able to open <code>dune utop</code>, evaluate:
+</p>
+<div class="org-src-container">
+<pre class="src src-ocaml"><span style="color: #228b22;">Lab07.</span>parse <span style="color: #8b2252;">"( (a b   c ) () ((d e ) f))"</span><span style="color: #ff4500;">;;</span>
+</pre>
+</div>
+<p>
+and see:
+</p>
+<div class="org-src-container">
+<pre class="src src-ocaml"><span style="color: #000000; background-color: #ffffff;">Some</span>
+ (<span style="color: #228b22;">Lab07__.Ast.</span><span style="color: #000000; background-color: #ffffff;">List</span>
+   [<span style="color: #228b22;">Lab07__.Ast.</span><span style="color: #000000; background-color: #ffffff;">List</span>
+     [<span style="color: #228b22;">Lab07__.Ast.</span><span style="color: #000000; background-color: #ffffff;">Atom</span> <span style="color: #8b2252;">"a"</span>; <span style="color: #228b22;">Lab07__.Ast.</span><span style="color: #000000; background-color: #ffffff;">Atom</span> <span style="color: #8b2252;">"b"</span>; <span style="color: #228b22;">Lab07__.Ast.</span><span style="color: #000000; background-color: #ffffff;">Atom</span> <span style="color: #8b2252;">"c"</span>];
+    <span style="color: #228b22;">Lab07__.Ast.</span><span style="color: #000000; background-color: #ffffff;">List</span> <span style="color: #000000; background-color: #ffffff;">[]</span>;
+    <span style="color: #228b22;">Lab07__.Ast.</span><span style="color: #000000; background-color: #ffffff;">List</span>
+     [<span style="color: #228b22;">Lab07__.Ast.</span><span style="color: #000000; background-color: #ffffff;">List</span> [<span style="color: #228b22;">Lab07__.Ast.</span><span style="color: #000000; background-color: #ffffff;">Atom</span> <span style="color: #8b2252;">"d"</span>; <span style="color: #228b22;">Lab07__.Ast.</span><span style="color: #000000; background-color: #ffffff;">Atom</span> <span style="color: #8b2252;">"e"</span>];
+      <span style="color: #228b22;">Lab07__.Ast.</span><span style="color: #000000; background-color: #ffffff;">Atom</span> <span style="color: #8b2252;">"f"</span>]])
+</pre>
+</div></li>
+</ol>
+
+<p>
+As usual, please use this opportunity to clear up any confusions you
+have by asking the course staff questions. They're very smart folks!
+</p>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">The lexer generator we'll be using is called Ocamllex
+and the parser generator is called Menhir, both of which are veritable
+beasts of software, really only worth engaging with if you have to.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">If you did, in fact, do <a href="https://bu-cs320.github.io/cs320-s26/labs/lab05/lab05.html">Lab 5</a> during the second of our
+snowstorms.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3" role="doc-backlink">3</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">A not-completely-popular
+choice we will try to justify at a later time.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.4" class="footnum" href="#fnr.4" role="doc-backlink">4</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">Feel free to ignore all the <code>lexbuf</code> stuff,
+but if you're interested, ocamllex maintains a buffer for part of
+the input that it's processing called <code>lexbuf</code>.  The
+function <code>Lexing.lexeme</code> grabs the beginning of that buffer
+corresponding to the pattern just matched (e.g., the <code>atom</code> regular
+expression).</p></div></div>
+
+
+</div>
+</div></div>
+</body>
+</html>
