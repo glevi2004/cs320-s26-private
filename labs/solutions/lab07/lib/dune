@@ -1,0 +1,3 @@
+(library (name lab07) (public_name lab07))
+(ocamllex lexer)
+(menhir (modules parser))
