@@ -54,27 +54,32 @@ let rec eval (e : expr) : value =
        ─────────────── (intLitE)
            n ⇓ n
     *)
-    ignore n; assert false (* TODO *)
+    VNum n
   | Fun (x, e) ->
     (*
        ───────────────────── (funE)
        fun x -> e ⇓ λ x . e
     *)
-    ignore (x, e); assert false (* TODO *)
+    VFun (x, e)
   | App (e1, e2) ->
     (*
        e₁ ⇓ λ x . e      e₂ ⇓ v₂      e' = [v₂ / x]e      e' ⇓ v
        ─────────────────────────────────────────────────────────── (appE)
                              ℰ ⊢ e₁ e₂ ⇓ v
     *)
-    ignore (e1, e2); assert false (* TODO *)
+    (match eval e1 with
+     | VFun (x, e) ->
+       let v2 = eval e2 in
+       eval (subst v2 x e)
+     | _ -> assert false)
   | Let (x, e1, e2) ->
     (*
        e₁ ⇓ v₁    e = [v₁ / x]e₂      e ⇓ v
        ───────────────────────────────────── (letE)
              ℰ ⊢ let x = e₁ in e₂ ⇓ v
     *)
-    ignore (x, e1, e2); assert false (* TODO *)
+    let v1 = eval e1 in
+    eval (subst v1 x e2)
 
 let rec fv e =
   match e with

@@ -32,34 +32,41 @@ let rec eval (env : dyn_env) (e : expr) : value =
        ────────── (varE)
        ℰ ⊢ x ⇓ v
     *)
-    ignore (env, y); assert false (* TODO *)
+    Env.find y env
   | Num n ->
     (*
        n is an int lit
        ─────────────── (intLitE)
          ℰ ⊢ n ⇓ n
     *)
-    ignore n; assert false (* TODO *)
+    VNum n
   | Fun (x, e) ->
     (*
        ───────────────────────── (funE)
        ℰ ⊢ fun x -> e ⇓ λ x . e
     *)
-    ignore (x, e); assert false (* TODO *)
+    VFun (x, e)
   | App (e1, e2) ->
     (*
        ℰ ⊢ e₁ ⇓ λ x . e      ℰ ⊢ e₂ ⇓ v₂      ℰ' = ℰ[x ↦ v₂]      ℰ' ⊢ e ⇓ v
        ───────────────────────────────────────────────────────────────────────── (appE)
                                    ℰ ⊢ e₁ e₂ ⇓ v
     *)
-    ignore (e1, e2); assert false (* TODO *)
+    (match eval env e1 with
+     | VFun (x, e) ->
+       let v2 = eval env e2 in
+       let env' = Env.add x v2 env in
+       eval env' e
+     | _ -> assert false)
   | Let (x, e1, e2) ->
     (*
        ℰ ⊢ e₁ ⇓ v₁      ℰ' = ℰ[x ↦ v₁]      ℰ' ⊢ e₂ ⇓ v
        ─────────────────────────────────────────────────── (letE)
                     ℰ ⊢ let x = e₁ in e₂ ⇓ v
     *)
-    ignore (x, e1, e2); assert false (* TODO *)
+    let v1 = eval env e1 in
+    let env' = Env.add x v1 env in
+    eval env' e2
 
 let interp (s : string) : value option =
   match parse s with
