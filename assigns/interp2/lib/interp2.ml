@@ -208,6 +208,7 @@ let type_of_pattern (p : pattern) (expected : ty) : (ctxt, Error_msg.t) result =
                  go pi ti ctx)
               (Ok ctx) pairs)
        | _ -> Error (exp_tuple_pat p.pos expected))
+    | PVar "_" -> Ok ctx
     | PVar x ->
       if Env.mem x ctx then Error (bound_several_times p.pos x)
       else Ok (Env.add x expected ctx)
@@ -270,20 +271,18 @@ let type_of_expr (ctxt : ctxt) (e : expr) : (ty, Error_msg.t) result =
       Ok (List.fold_right (fun (_, ty) acc -> TFun (ty, acc)) args ret_ty)
     | App (f_expr, arg_exprs) ->
       let* f_ty = go ctxt f_expr in
-      let rec peel ty args first =
+      let rec peel ty args =
         match args with
         | [] -> Ok ty
         | a :: rest ->
           (match ty with
            | TFun (t_param, t_rest) ->
              let* t_arg = go ctxt a in
-             if t_arg = t_param then peel t_rest rest false
+             if t_arg = t_param then peel t_rest rest
              else Error (exp_ty a.pos t_arg t_param)
-           | _ ->
-             if first then Error (not_func f_expr.pos ty)
-             else Error (too_many_args f_expr.pos f_ty))
+           | _ -> Error (not_func f_expr.pos ty))
       in
-      peel f_ty arg_exprs true
+      peel f_ty arg_exprs
     | Let {is_rec; name; args; annot; binding; body} ->
       (match is_rec, args, annot with
        | true, [], _ -> Error (missing_rec_arg e.pos)
