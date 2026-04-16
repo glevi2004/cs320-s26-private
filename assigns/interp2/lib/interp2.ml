@@ -1,6 +1,14 @@
 open Utils
 module Error_msg = Error_msg
 
+let combine_opt l r =
+  let rec go acc l r =
+    match l, r with
+    | x :: xs, y :: ys -> go ((x, y) :: acc) xs ys
+    | [], [] -> Some (List.rev acc)
+    | _ -> None
+  in go [] l r
+
 (* SYNTAX
    ----------------------------------------------------------------------
 *)
